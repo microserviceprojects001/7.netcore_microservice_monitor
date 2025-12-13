@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # 专用主节点 - 负责集群管理，不存储数据分片
+  es-master:
+    image: registry.cn-hangzhou.aliyuncs.com/abelcontainer/elasticsearch:8.11.0
+    container_name: es-master
+    environment:
+      - node.name=es-master
+      - cluster.name=my-es-cluster  # 集群名称，三个节点必须相同
+      - discovery.seed_hosts=es-master,es-data1,es-data2  # 节点发现列表
+      - cluster.initial_master_nodes=es-master,es-data1,es-data2  # 初始候选主节点
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"  # JVM堆内存，根据您机器内存调整
+      - node.roles=master,data  # 此容器仅作为主节点角色
+      - xpack.security.enabled=false  # 开发环境禁用安全认证（生产环境必须开启！）
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 800m  # Docker容器总内存限制
+    ports:
+      - "9200:9200"  # 宿主机端口9200映射到此容器的9200 (REST API)
+      - "9300:9300"  # 宿主机端口9300映射到此容器的9300 (集群内部通信)
+    networks:
+      - elastic
+
+  # 数据节点1 - 负责存储数据和执行查询，可持有主分片和副本分片
+  es-data1:
+    image: registry.cn-hangzhou.aliyuncs.com/abelcontainer/elasticsearch:8.11.0
+    container_name: es-data1
+    environment:
+      - node.name=es-data1
+      - cluster.name=my-es-cluster
+      - discovery.seed_hosts=es-master,es-data1,es-data2
+      - cluster.initial_master_nodes=es-master,es-data1,es-data2
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.roles=master,data  # 此容器仅作为数据节点角色
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 800m
+    volumes:
+      - es-data1:/usr/share/elasticsearch/data  # 使用命名卷持久化数据，避免Windows路径问题
+    ports:
+      - "9201:9200"  # 宿主机端口9201映射到此容器的9200
+      - "9301:9300"  # 宿主机端口9301映射到此容器的9300
+    networks:
+      - elastic
+
+  # 数据节点2 - 另一个数据节点，用于构成副本和高可用
+  es-data2:
+    image: registry.cn-hangzhou.aliyuncs.com/abelcontainer/elasticsearch:8.11.0
+    container_name: es-data2
+    environment:
+      - node.name=es-data2
+      - cluster.name=my-es-cluster
+      - discovery.seed_hosts=es-master,es-data1,es-data2
+      - cluster.initial_master_nodes=es-master,es-data1,es-data2
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      - node.roles=master,data
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 800m
+    volumes:
+      - es-data2:/usr/share/elasticsearch/data
+    ports:
+      - "9202:9200"  # 宿主机端口9202映射到此容器的9200
+      - "9302:9300"  # 宿主机端口9302映射到此容器的9300
+    networks:
+      - elastic
+
+# 定义数据卷，数据将持久化保存在这里
+volumes:
+  es-data1:
+  es-data2:
+
+# 定义容器使用的网络，便于彼此发现和通信
+networks:
+  elastic:
+    driver: bridge
