@@ -9,10 +9,10 @@ services:
       - node.name=es-master
       - cluster.name=my-es-cluster  # 集群名称，三个节点必须相同
       - discovery.seed_hosts=es-master,es-data1,es-data2  # 节点发现列表
-      - cluster.initial_master_nodes=es-master,es-data1,es-data2  # 初始候选主节点
+      - cluster.initial_master_nodes=es-master # 初始候选主节点
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms400m -Xmx400m"  # JVM堆内存，根据您机器内存调整
-      - node.roles=master,data  # 此容器仅作为主节点角色
+      - node.roles=master  # 此容器仅作为主节点角色
       - xpack.security.enabled=false  # 开发环境禁用安全认证（生产环境必须开启！）
     ulimits:
       memlock:
@@ -33,10 +33,10 @@ services:
       - node.name=es-data1
       - cluster.name=my-es-cluster
       - discovery.seed_hosts=es-master,es-data1,es-data2
-      - cluster.initial_master_nodes=es-master,es-data1,es-data2
+      - cluster.initial_master_nodes=es-master
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
-      - node.roles=master,data  # 此容器仅作为数据节点角色
+      - node.roles=data  # 此容器仅作为数据节点角色
       - xpack.security.enabled=false
     ulimits:
       memlock:
@@ -59,10 +59,10 @@ services:
       - node.name=es-data2
       - cluster.name=my-es-cluster
       - discovery.seed_hosts=es-master,es-data1,es-data2
-      - cluster.initial_master_nodes=es-master,es-data1,es-data2
+      - cluster.initial_master_nodes=es-master
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
-      - node.roles=master,data
+      - node.roles=data
       - xpack.security.enabled=false
     ulimits:
       memlock:
