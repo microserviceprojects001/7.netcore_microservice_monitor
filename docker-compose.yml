@@ -76,7 +76,32 @@ services:
       - "9302:9300"  # 宿主机端口9302映射到此容器的9300
     networks:
       - elastic
-
+  # Kibana - 数据可视化平台
+  kibana:
+    image: registry.cn-hangzhou.aliyuncs.com/abelcontainer/kibana:8.11.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es-master:9200 # 核心：通过容器名连接
+      # 如果未来开启安全认证，需添加如下配置（当前未开启）：
+      # - ELASTICSEARCH_USERNAME=kibana_system
+      # - ELASTICSEARCH_PASSWORD=your_password
+      - XPACK_SECURITY_ENABLED=false # 与ES配置保持一致
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic
+    depends_on:
+      - es-master
+      - es-data1
+      - es-data2
+    mem_limit: 800m
+    # 可选：增加健康检查，确保Kibana在ES完全就绪后才启动
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://es-master:9200"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 # 定义数据卷，数据将持久化保存在这里
 volumes:
   es-data1:
