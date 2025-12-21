@@ -1,0 +1,5 @@
+
+Start-Date: 2025-12-21  01:15:08
+Commandline: apt-get install -y telnet netcat-openbsd
+Install: telnet:amd64 (0.17-42), netbase:amd64 (6.3, automatic), libbsd0:amd64 (0.11.3-1+deb11u1, automatic), libmd0:amd64 (1.0.3-3, automatic), netcat-openbsd:amd64 (1.217-3)
+End-Date: 2025-12-21  01:15:10

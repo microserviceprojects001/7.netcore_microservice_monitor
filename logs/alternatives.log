@@ -1,0 +1,4 @@
+update-alternatives 2025-12-21 01:15:10: run with --install /usr/bin/telnet telnet /usr/bin/telnet.netkit 100 --slave /usr/share/man/man1/telnet.1.gz telnet.1.gz /usr/share/man/man1/telnet.netkit.1.gz
+update-alternatives 2025-12-21 01:15:10: link group telnet updated to point to /usr/bin/telnet.netkit
+update-alternatives 2025-12-21 01:15:10: run with --install /bin/nc nc /bin/nc.openbsd 50 --slave /bin/netcat netcat /bin/nc.openbsd --slave /usr/share/man/man1/nc.1.gz nc.1.gz /usr/share/man/man1/nc_openbsd.1.gz --slave /usr/share/man/man1/netcat.1.gz netcat.1.gz /usr/share/man/man1/nc_openbsd.1.gz
+update-alternatives 2025-12-21 01:15:10: link group nc updated to point to /bin/nc.openbsd
