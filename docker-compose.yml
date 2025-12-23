@@ -119,6 +119,22 @@ services:
     depends_on:
       - es-master
     mem_limit: 500m
+  my_net_app:
+    image: helloworld:serilog-structured
+    container_name: my_net_app_prod
+    ports:
+      - "8080:80"
+      - "8444:444"
+    # 核心配置：在这里统一设置日志驱动
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        # 可以添加更多标签，方便在Fluentd中路由
+        tag: "prod.app.{{.Name}}"
+    # 确保与Fluentd在同一个网络，才能用localhost访问
+    networks:
+      - elastic
 # 定义数据卷，数据将持久化保存在这里
 volumes:
   es-data1:
